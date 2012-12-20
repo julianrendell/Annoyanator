@@ -1,4 +1,5 @@
-#include <avr/pgmspace.h>
+#include <avr/sleep.h>
+#include <avr/power.h>#include <avr/pgmspace.h>
 
 //TypeDefs
 // This will make it easier to name annoy functions, and make it really easy to call them later.
@@ -31,32 +32,78 @@ const uint8_t sample_data[] PROGMEM = {
 	123,207,0,170,133,19,238,59,49,225,23,150,182,0,228,157,47,255,77,114,246,19,183,204,30,235,115,77,255,55,117,246,7,165,184,10,242,129,16,240,60,84,226,10,176,191,11,213,86,52,255,34,109,230,9,182,168,0,239,138,25,246,66,91,225,3,169,187,7,215,94,60,251,27,106,201,8,195,127,4,255,98,38,241,45,128,198,1,200,126,45,234,41,129,218,0,187,144,45,248,
 	52,76,255,17,119,224,10,187,135,18,239,65,79,212,17,189,164,3,232,106,91,252,11,120,224,0,179,165,15,227,79,81,242,26,158,169,32,245,84,51,220,28,161,177,0,223,131,35,234,50,118,205,1,193,135,31,206,40,142,207,0,174,115,72,247,16,75,209,9,172,142,0,220,82,68,229,26,154,161,28,239,74,42,203,34,176,160,0,223,142,80,245,26,117,244,8,178,178,16,222,
 	87,89,246,24,136,151,59,255,73,48,221,35,171,188,0,214,144,19,228,54,87,225,4,162,167,28,215,60,95,228,13,168,157,55,253,55,59,228,37,167,147,0,239,117,43,232,35,129,215,10,198,130,48,230,39,135,211,11,199,122,63,253,34,98,206,0,190,155,13,242,86,72,247,31,147,177,17,233,105,61,224,32,168,186,0,218,119,71,255,36,94,207,36,214,125,31,227,65,153,186,
-	17,208,103,110,225,5,169,175,32,232,70,69,247,26,147,185,1,213,109,54,247,41,126,189,27,224,104,50,207,61,203,154,8,219,80,111,223,0,167,168,19,239,92,66,233,24,161,209,7,208,114,54,235,33,126,177,18,224,107,66,199,19,175,158,22,202,52,123,228,12,170,131,76,255,48,76,196,58,230,150,0,229,198,26,239,133,80,255,41,76,242,34,165,161,31,255,100,63,219,49,
-	198,177,3,207,100,124,224,1,161,166,58,249,55,59,254,38,146,200,0,207,163,29,250,79,61,255,42,129,223,0,187,202,16,229,112,40,255,76,121,206,20,203,141,90,230,32,150,167,46,255,82,35,224,45,165,230,0,172,199,53,240,85,8,255,120,75,226,18,129,255,3,104,229,57,212,126,27,255,75,82,223,42,198,150,1,240,120,77,183,7,182,255,19,120,152,28,255,161,0,236,
-	124,48,255,78,71,234,21,156,246,0,145,216,100,255,116,0,243,169,154,241,0,126,255,17,177,193,4,223,122,43,255,67,83,232,12,154,255,0,110,255,68,143,198,0,196,227,26,196,95,80,255,33,100,229,14,189,186,0,225,156,9,255,112,8,254,86,28,255,118,54,228,23,102,255,32,118,208,2,204,193,0,226,150,4,249,110,35,255,72,7,207,155,215,227,8,0,140,255,208,103,
 	};
 
+int MIN_COUNTER_TRIGGER; 
+int MAX_COUNTER_TRIGGER; 
 
+// default values slowly get reduced in size as time goes on.
+int DEFAULT_MIN_COUNTER_TRIGGER = 37; // 37 * 8 sec = 5 minutes (approximately)
+int DEFAULT_MAX_COUNTER_TRIGGER = 60; // 60 * 8 sec = 8 minutes
+int const DEMO_MIN_COUNTER_TRIGGER = 2;
+int const DEMO_MAX_COUNTER_TRIGGER = 5;
+
+int const DEFAULT_WATCHDOG_PARAM = 9; // 9 = 8 sec
+int const DEMO_WATCHDOG_PARAM = 7; // 7 = 2 sec
+
+long const DAY = 10800; // 10800 * 8 sec = 24 hours
+
+long counter_trigger;
+long const DEFAULT_INITIAL_COUNTER_TRIGGER = 300/8; // 5 minutes
+long const DEMO_INITIAL_COUNTER_TRIGGER = 3;
+
+long active_counter = 0; // how many watchdog timeouts we've been active for, after initial delay
+boolean started = false; // don't start decreasing the default triggers until after the initial trigger
+
+boolean demo_mode;
+
+//int DUTY = 5; // quiet
 int const SOUND_DUTY = 30;
 
+// updated by Watchdog interrupt, hence 'volatile'
+volatile long watchdog_counter = 0;
+
 // outputs
-unsigned int const PIEZO_PIN = 9;
-unsigned int const RED_LED_PIN = 10;
-unsigned int const BLUE_LED_PIN =11;
-unsigned int const LEFT_PAGER_MOTOR_PIN = 7;
-unsigned int const RIGHT_PAGER_MOTOR_PIN = 6;
+byte const PIEZO_PIN = 9;
+byte const RED_LED_PIN = 10;
+byte const BLUE_LED_PIN =11;
+byte const LEFT_PAGER_MOTOR_PIN = 7;
+byte const RIGHT_PAGER_MOTOR_PIN = 6;
 
 // inputs
+// High = Demo, Low = hidden
+byte const DEMO_CONFIG_PIN = 5;
+// LOW = do stuff when dark, HIGH = do stuff when light
+// NB- LDR needs to be on highside of voltage divider
+byte const LIGHT_LEVEL_CONFIG_PIN = 4;
 // using pin 2 as it could be used to drive interrupts
-unsigned int const TIMER_CONFIG_PIN = 5;
-unsigned int const LIGHT_LEVEL_CONFIG_PIN = 4;
-unsigned int const LDR_PIN = 2;
+byte const LDR_PIN = 2;
 
 // annoy functions
-annoyFunctionPtr AnnoyFunctionArray[] = { &annoy0, &annoy1, &annoy2, &annoy3, &annoy4, &annoy5,  &play_pcm, &blink_eyes};
-//annoyFunctionPtr AnnoyFunctionArray[] = { &play_pcm};
+annoyFunctionPtr AnnoyFunctionArray[] = { &annoy0, &annoy1, &annoy2, &annoy3, &annoy4, &annoy5,  &play_pcm, &flash_eyes, &flash_body,  &pulse_eyes, &pulse_body, &spin_motors};
+//annoyFunctionPtr AnnoyFunctionArray[] = {&spin_motors};
 
 unsigned int NumberOfAnnoyFunctions = sizeof(AnnoyFunctionArray) / sizeof(annoyFunctionPtr);
+
+void doConfig() {
+  if (demo_mode) 
+  {
+    MIN_COUNTER_TRIGGER = DEMO_MIN_COUNTER_TRIGGER;
+    MAX_COUNTER_TRIGGER = DEMO_MAX_COUNTER_TRIGGER;
+    setup_watchdog(DEMO_WATCHDOG_PARAM);
+  }
+  else 
+  {
+    MIN_COUNTER_TRIGGER = DEFAULT_MIN_COUNTER_TRIGGER;
+    MAX_COUNTER_TRIGGER = DEFAULT_MAX_COUNTER_TRIGGER;
+    setup_watchdog(DEFAULT_WATCHDOG_PARAM);
+  }
+}
+
+void newTriggerCounter() {
+  counter_trigger = random(MIN_COUNTER_TRIGGER, MAX_COUNTER_TRIGGER);
+}
+
 
 void setup(){
   #ifdef SERIAL_DEBUG
@@ -72,22 +119,101 @@ void setup(){
   pinMode(PIEZO_PIN, OUTPUT);
   pinMode(LDR_PIN,INPUT);
   pinMode(LIGHT_LEVEL_CONFIG_PIN,INPUT);
-  pinMode(TIMER_CONFIG_PIN,INPUT);
+  pinMode(DEMO_CONFIG_PIN,INPUT);
   
-  // other setup
   randomSeed(millis());
+
+  demo_mode = digitalRead(DEMO_CONFIG_PIN);
+  doConfig();  
   
+  // Set up hardware power down options  
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN); 
+
+  ADCSRA &= ~(1<<ADEN); //Disable ADC
+  ACSR = (1<<ACD); //Disable the analog comparator
+  DIDR0 = 0x3F; //Disable digital input buffers on all ADC0-ADC5 pins
+
+  sei();
+    
+  newTriggerCounter();
+  
+  counter_trigger += (demo_mode ? DEMO_INITIAL_COUNTER_TRIGGER : DEFAULT_INITIAL_COUNTER_TRIGGER);
+  
+    // flip the safety switch - sleep commands will now cause the system to powerdown
+  sleep_enable();
+
 }
 
 
 void loop(){
   #ifdef SERIAL_DEBUG
-  Serial.println("-> Loop");
+  Serial.print("Sleeping...");
+  Serial.flush();
+  delay(20);
+  
+  #endif
+  sleep_mode();
+
+  #ifdef SERIAL_DEBUG
+  Serial.println("awake");
   #endif
 
-  annoy();
+  demo_mode = digitalRead(DEMO_CONFIG_PIN);
+
+  if (started && !demo_mode) {
+    active_counter++;
+  }
+
+  // reduce default delay intervals every two days or so.
+  if (active_counter >= DAY*2) {
+    active_counter = 0;
+    
+    // halve the defaults...
+    DEFAULT_MIN_COUNTER_TRIGGER = DEFAULT_MIN_COUNTER_TRIGGER / 2;
+    DEFAULT_MAX_COUNTER_TRIGGER = DEFAULT_MAX_COUNTER_TRIGGER / 2;
+  }
+
+  doConfig();  // we can switch from demo to 'hidden' mode on the fly & this will update the default durations between activations
   
-  delay(1000);  
+  if (watchdog_counter >= counter_trigger) {
+    watchdog_counter = 0;
+    newTriggerCounter();
+    started = true;
+    if (digitalRead(LIGHT_LEVEL_CONFIG_PIN) == digitalRead(LDR_PIN)) {
+      Serial.println("LDR level & light config match! ")
+      Serial.println("Value is:");
+      Serial.println(digitalRead(LIGHT_LEVEL_CONFIG_PIN));
+      
+      annoy();
+    } 
+  }
+}
+  
+
+// 0=16ms, 1=32ms,2=64ms,3=128ms,4=250ms,5=500ms
+// 6=1 sec,7=2 sec, 8=4 sec, 9= 8sec
+void setup_watchdog(int ii) {
+
+  byte bb;
+  int ww;
+  if (ii > 9 ) ii=9;
+  bb=ii & 7;
+  if (ii > 7) bb|= (1<<5);
+  bb|= (1<<WDCE);
+  ww=bb;
+
+  MCUSR &= ~(1<<WDRF);
+  // start timed sequence
+  WDTCR_REG |= (1<<WDCE) | (1<<WDE);
+  // set new watchdog timeout value
+  WDTCR_REG = bb;
+  WDTCR_REG |= _BV(WDIE);
+}
+
+
+// executed when watchdog timer expires
+ISR(WDT_vect) {
+  watchdog_counter++;  // increment volatile
 }
 
 // Play sounnd- shamelessly copied from https://github.com/lewisd32/AnnoyATtiny85/blob/master/AnnoyATTiny85.ino
@@ -180,16 +306,78 @@ void annoy3_basis(int min, int max) {
   }
 }
 
-void blink_eyes() {
-  for(int i = 0; i < 10; ++i) {
-    for(int j = 0; j <= 255; ++j) {
-      analogWrite(RED_LED_PIN, j);
-      delayMicroseconds(250);
+void flash_led(byte pin) {
+  byte cycles = random(5, 20);
+  byte incr = random(1,5);
+  unsigned int del = random (50, 500 + 500 / (cycles / incr ));
+  
+  for(int i = 0; i < cycles; ++i) {
+    for(int j = 0; j <= 255-incr; j += incr) {
+      analogWrite(pin, j);
+      delayMicroseconds(del);
     }
-  analogWrite(RED_LED_PIN, 0);
-  delay(25);
+  analogWrite(pin, 0);
   }
 }
+
+void flash_eyes() {
+  flash_led(RED_LED_PIN);
+}
+
+void flash_body() {
+  flash_led(BLUE_LED_PIN);
+}
+
+void pulse_led(byte pin) {
+  byte cycles = random(5,10);
+  byte incr = random(1,10);
+  unsigned int del = random(10, 125);
+  byte i,j;
+
+  for (i=0; i<cycles; ++i){
+    for(j=0; j<=255-incr; j += incr) {
+      analogWrite(pin, j);
+      delay(del);
+    }
+    for(j=255; j>incr; j -= incr) {
+      analogWrite(pin, j);
+      delay(del);
+    }
+  }
+  analogWrite(pin,0);
+  
+}
+
+void pulse_eyes() {
+  pulse_led(RED_LED_PIN);
+}
+
+void pulse_body() {
+  pulse_led(BLUE_LED_PIN);
+}
+
+void spin_motors() {
+  byte motors_to_use = random(1,4);
+  unsigned int del = random(250, 2500);
+   // ah bit masks :)
+   if (motors_to_use & 1) {
+     digitalWrite(LEFT_PAGER_MOTOR_PIN, HIGH);
+       #ifdef SERIAL_DEBUG
+       Serial.println("Left motor on");
+       #endif
+   }
+   if (motors_to_use & 2) {
+     digitalWrite(RIGHT_PAGER_MOTOR_PIN, HIGH);
+       #ifdef SERIAL_DEBUG
+       Serial.println("Right motor on");
+       #endif
+
+   }
+   
+   delay(del);
+   digitalWrite(LEFT_PAGER_MOTOR_PIN, LOW);
+   digitalWrite(RIGHT_PAGER_MOTOR_PIN, LOW);   
+}      
 
 void play_pcm() {
   DDRB = _BV(PB1);
