@@ -7,9 +7,11 @@
 typedef void (*annoyFunctionPtr)(void);
 
 // defines
-#define SERIAL_DEBUG
+//#define SERIAL_DEBUG
 
 const uint8_t sample_data[] PROGMEM = {
+        0,0,180,181,163,167,193,200,208,209,227,233,202,195,185,167,183,187,195,212,214,222,225,220,204,169,150,155,151,159,186,207,207,219,236,226,206,178,158,167,161,166,187,206,213,209,229,233,196,164,164,180,147,142,213,212,200,231,238,243,189,152,193,138,121,193,198,209,214,224,254,236,151,137,211,122,66,210,199,143,222,214,250,234,102,218,153,59,231,127,127,247,134,200,247,115,
+	210,176,86,169,127,164,164,75,236,226,111,203,192,160,63,99,213,20,78,182,157,217,94,207,228,15,181,137,91,233,52,170,247,83,231,195,122,140,79,242,177,74,239,130,130,181,91,251,135,53,255,111,105,241,115,167,116,118,255,82,122,244,92,177,123,115,218,36,129,251,180,116,98,230,160,10,128,160,125,99,140,255,98,93,255,83,0,173,153,114,92,173,255,51,114,223,43,213,178,84,
 	255,81,61,245,210,112,94,255,157,0,165,220,90,72,212,217,27,182,255,54,82,182,158,71,22,231,187,72,216,115,190,173,28,239,113,0,228,219,83,76,235,207,0,105,176,134,114,143,178,80,173,214,15,142,243,124,111,34,170,126,7,228,178,122,160,100,241,165,60,244,155,24,115,255,165,0,152,161,32,213,236,3,33,255,255,67,129,251,130,89,171,144,118,123,134,164,6,84,231,4,
 	75,255,140,31,136,255,114,0,228,114,11,221,158,52,79,217,246,6,75,163,76,195,58,57,254,94,155,216,71,136,134,129,124,96,246,147,88,255,110,157,213,92,238,127,143,186,5,195,138,9,192,161,135,79,115,185,1,140,159,0,196,239,133,35,65,204,32,115,188,0,125,254,140,68,129,159,63,181,145,0,168,255,67,54,255,151,81,255,103,1,246,212,67,112,200,155,95,205,98,36,
 	247,228,92,66,177,116,1,193,117,0,229,255,32,70,250,33,88,224,0,84,236,123,86,139,112,133,216,143,51,168,255,102,0,204,225,52,228,153,12,251,214,0,59,255,116,87,232,19,39,255,146,21,193,79,44,233,41,9,255,168,48,254,131,95,255,135,51,159,182,105,164,148,74,255,175,0,201,255,119,146,62,65,228,22,27,255,116,18,248,108,59,138,119,255,97,8,164,166,67,76,
@@ -20,6 +22,9 @@ const uint8_t sample_data[] PROGMEM = {
 	161,231,34,202,158,112,235,99,171,194,0,129,189,0,156,211,112,107,69,252,136,44,243,63,0,250,247,9,57,255,168,0,190,164,73,159,9,166,189,27,215,78,70,241,83,78,99,214,232,0,119,255,55,179,172,79,200,73,182,147,20,241,151,10,73,229,244,0,117,230,0,157,180,53,233,86,116,209,0,179,202,0,165,249,60,177,126,152,203,17,194,123,34,214,49,151,181,0,201,119,
 	106,244,48,182,176,73,225,96,143,119,102,255,47,125,239,0,65,184,156,140,73,178,155,0,131,156,151,97,107,244,49,83,255,125,57,251,134,113,123,124,240,41,129,243,62,176,101,120,189,27,184,120,85,143,91,169,121,233,145,74,215,120,160,117,149,227,117,121,71,170,103,56,255,65,87,242,58,187,166,113,243,35,142,255,47,173,217,32,142,255,135,47,216,206,84,100,241,193,0,110,
 	255,34,42,255,60,82,255,87,189,184,66,253,93,97,252,28,129,255,62,0,203,235,125,119,81,184,80,0,225,123,0,166,255,35,71,243,47,125,142,104,223,41,165,199,27,244,170,77,121,49,160,77,51,154,191,95,104,214,58,181,228,4,69,255,189,0,160,255,82,43,116,244,140,17,253,126,30,255,75,99,240,41,187,152,38,254,80,80,255,28,82,255,35,57,228,17,133,181,44,236,
+// Have to shorten the sample length if we enable debug messages.
+// Yes, memory is that tight.
+#ifndef SERIAL_DEBUG
 	112,50,255,157,0,211,208,26,224,129,87,240,33,140,167,2,230,143,9,255,184,0,182,178,16,205,109,129,202,47,216,127,63,255,128,0,168,255,79,175,173,112,130,55,214,92,70,218,110,63,60,208,90,59,232,103,151,94,116,171,10,203,161,0,211,250,10,163,180,91,136,52,218,147,0,240,214,34,241,151,70,216,144,184,64,107,226,9,147,252,15,0,188,202,27,191,225,94,51,155,
 	220,3,99,228,2,80,255,120,9,150,193,181,46,130,233,25,158,255,22,111,220,56,196,114,86,169,67,216,110,92,255,78,0,255,193,27,144,116,191,115,50,247,64,122,255,6,146,213,16,218,154,89,248,67,168,191,36,241,135,0,228,255,37,96,138,119,194,47,178,160,51,246,52,43,255,41,108,255,59,169,152,54,224,55,121,255,0,126,255,39,146,175,99,255,70,107,238,35,199,165,
 	27,213,96,165,204,0,185,185,15,243,121,0,215,77,52,194,73,162,106,31,254,80,28,255,64,105,229,14,145,128,89,252,35,116,255,10,157,229,0,139,167,20,166,85,172,213,3,208,183,0,208,202,7,239,173,37,195,74,177,206,1,209,137,28,255,74,55,255,53,142,191,39,243,120,56,254,36,96,255,36,138,235,52,234,157,38,247,70,90,255,26,112,250,0,136,180,6,207,110,87,
@@ -32,36 +37,41 @@ const uint8_t sample_data[] PROGMEM = {
 	123,207,0,170,133,19,238,59,49,225,23,150,182,0,228,157,47,255,77,114,246,19,183,204,30,235,115,77,255,55,117,246,7,165,184,10,242,129,16,240,60,84,226,10,176,191,11,213,86,52,255,34,109,230,9,182,168,0,239,138,25,246,66,91,225,3,169,187,7,215,94,60,251,27,106,201,8,195,127,4,255,98,38,241,45,128,198,1,200,126,45,234,41,129,218,0,187,144,45,248,
 	52,76,255,17,119,224,10,187,135,18,239,65,79,212,17,189,164,3,232,106,91,252,11,120,224,0,179,165,15,227,79,81,242,26,158,169,32,245,84,51,220,28,161,177,0,223,131,35,234,50,118,205,1,193,135,31,206,40,142,207,0,174,115,72,247,16,75,209,9,172,142,0,220,82,68,229,26,154,161,28,239,74,42,203,34,176,160,0,223,142,80,245,26,117,244,8,178,178,16,222,
 	87,89,246,24,136,151,59,255,73,48,221,35,171,188,0,214,144,19,228,54,87,225,4,162,167,28,215,60,95,228,13,168,157,55,253,55,59,228,37,167,147,0,239,117,43,232,35,129,215,10,198,130,48,230,39,135,211,11,199,122,63,253,34,98,206,0,190,155,13,242,86,72,247,31,147,177,17,233,105,61,224,32,168,186,0,218,119,71,255,36,94,207,36,214,125,31,227,65,153,186,
-	};
+	17,208,103,110,225,5,169,175,32,232,70,69,247,26,147,185,1,213,109,54,247,41,126,189,27,224,104,50,207,61,203,154,8,219,80,111,223,0,167,168,19,239,92,66,233,24,161,209,7,208,114,54,235,33,126,177,18,224,107,66,199,19,175,158,22,202,52,123,228,12,170,131,76,255,48,76,196,58,230,150,0,229,198,26,239,133,80,255,41,76,242,34,165,161,31,255,100,63,219,49,
+	198,177,3,207,100,124,224,1,161,166,58,249,55,59,254,38,146,200,0,207,163,29,250,79,61,255,42,129,223,0,187,202,16,229,112,40,255,76,121,206,20,203,141,90,230,32,150,167,46,255,82,35,224,45,165,230,0,172,199,53,240,85,8,255,120,75,226,18,129,255,3,104,229,57,212,126,27,255,75,82,223,42,198,150,1,240,120,77,183,7,182,255,19,120,152,28,255,161,0,236,
+	124,48,255,78,71,234,21,156,246,0,145,216,100,255,116,0,243,169,154,241,0,126,255,17,177,193,4,223,122,43,255,67,83,232,12,154,255,0,110,255,68,143,198,0,196,227,26,196,95,80,255,33,100,229,14,189,186,0,225,156,9,255,112,8,254,86,28,255,118,54,228,23,102,255,32,118,208,2,204,193,0,226,150,4,249,110,35,255,72,7,207,155,215,227,8,0,140,255,208,103,
+	51,6,216,224,88,196,57,17,255,163,45,250,152,0,210,224,26,223,157,0,237,166,51,253,64,53,255,58,109,235,0,148,231,0,193,190,0,215,184,0,240,176,0,212,159,6,255,173,0,202,179,70,255,90,0,247,175,129,255,33,28,255,114,58,255,45,55,255,55,100,255,12,67,209,118,239,156,0,0,76,255,185,11,18,11,219,212,2,197,142,54,229,42,117,255,63,63,23,135,254,
+	48,138,118,0,238,212,56,222,77,3,255,152,33,229,57,53,255,69,50,255,45,43,255,87,69,255,104,0,218,248,40,196,156,0,238,181,20,231,82,28,255,83,72,255,37,45,234,54,119,255,160,0,107,255,133,168,172,0,160,255,32,152,136,0,246,187,2,228,141,0,241,182,25,242,195,0,35,255,218,142,245,55,10,255,135,70,220,12,87,255,45,91,255,13,85,255,39,94,255,89,
+	0,192,244,155,254,110,0,224,208,62,222,68,19,255,103,43,255,49,72,255,41,75,255,56,2,232,255,240,255,136,0,103,255,171,175,159,0,178,252,27,189,151,0,246,155,3,255,131,0,213,107,125,255,89,0,3,175,255,121,93,45,2,254,192,56,211,44,50,255,77,73,247,17,108,255,24,108,255,23,33,254,187,215,244,16,0,198,255,255,241,31,0,255,215,81,209,54,42,255,96,
+	55,255,54,34,255,71,103,255,72,0,136,255,255,242,82,0,91,255,167,97,97,0,158,255,42,148,187,0,198,214,2,221,189,0,181,186,71,255,152,0,45,214,255,234,71,0,47,225,255,139,6,0,69,255,136,64,235,30,60,255,71,84,255,40,0,242,179,173,255,58,0,142,255,255,201,18,0,141,255,202,29,0,0,187,255,55,174,177,0,198,228,20,218,203,0,125,242,205,255,167,
+	0,0,159,255,253,93,0,0,116,255,229,45,0,0,154,255,140,161,144,0,162,255,196,251,125,0,15,82,247,255,60,0,0,45,251,255,42,2,8,13,237,253,59,144,83,4,225,255,255,226,19,0,170,255,255,122,0,0,22,193,255,150,7,0,8,159,255,249,81,0,0,24,203,255,143,0,2,0,83,255,222,28,0,0,88,253,255,195,18,0,154,255,255,255,45,16,200,57,114,255,
+	119,0,13,0,108,255,255,106,0,22,218,255,233,255,68,1,252,143,17,255,165,0,193,157,3,226,255,7,34,226,107,126,255,251,48,19,248,134,0,238,223,13,188,130,7,220,255,253,132,0,133,225,54,209,255,3,91,231,12,94,255,247,252,80,0,212,213,115,255,109,1,248,134,0,241,229,1,175,227,0,76,226,255,253,48,43,137,3,149,255,125,129,146,0,92,255,159,173,255,52,
+#endif
+};
 
-int MIN_COUNTER_TRIGGER; 
-int MAX_COUNTER_TRIGGER; 
+int MIN_TRIGGER_TIME; 
+int MAX_TRIGGER_TIME; 
 
+unsigned long next_trigger_delay;
 // default values slowly get reduced in size as time goes on.
-int DEFAULT_MIN_COUNTER_TRIGGER = 37; // 37 * 8 sec = 5 minutes (approximately)
-int DEFAULT_MAX_COUNTER_TRIGGER = 60; // 60 * 8 sec = 8 minutes
-int const DEMO_MIN_COUNTER_TRIGGER = 2;
-int const DEMO_MAX_COUNTER_TRIGGER = 5;
+int DEFAULT_MIN_TRIGGER_TIME = 300; // 5 minutes - will be halved every day
+int DEFAULT_MAX_TRIGGER_TIME = 600; // 10 minutes - will be halved every day
+int const DEMO_MIN_TRIGGER_TIME = 5; // seconds
+int const DEMO_MAX_TRIGGER_TIME = 10; //seconds
 
-int const DEFAULT_WATCHDOG_PARAM = 9; // 9 = 8 sec
-int const DEMO_WATCHDOG_PARAM = 7; // 7 = 2 sec
-
-long const DAY = 10800; // 10800 * 8 sec = 24 hours
-
-long counter_trigger;
-long const DEFAULT_INITIAL_COUNTER_TRIGGER = 300/8; // 5 minutes
-long const DEMO_INITIAL_COUNTER_TRIGGER = 3;
-
-long active_counter = 0; // how many watchdog timeouts we've been active for, after initial delay
-boolean started = false; // don't start decreasing the default triggers until after the initial trigger
+#ifdef SERIAL_DEBUG
+unsigned long const DAY = 5000; // for testing
+#else
+unsigned long const DAY = 24*60*60*1000; // in milliseconds
+#endif
 
 boolean demo_mode;
 
 //int DUTY = 5; // quiet
 int const SOUND_DUTY = 30;
 
-// updated by Watchdog interrupt, hence 'volatile'
-volatile long watchdog_counter = 0;
+// for tracking number of days active
+unsigned long active_days_counter = millis();
 
 // outputs
 byte const PIEZO_PIN = 9;
@@ -88,20 +98,18 @@ unsigned int NumberOfAnnoyFunctions = sizeof(AnnoyFunctionArray) / sizeof(annoyF
 void doConfig() {
   if (demo_mode) 
   {
-    MIN_COUNTER_TRIGGER = DEMO_MIN_COUNTER_TRIGGER;
-    MAX_COUNTER_TRIGGER = DEMO_MAX_COUNTER_TRIGGER;
-    setup_watchdog(DEMO_WATCHDOG_PARAM);
+    MIN_TRIGGER_TIME = DEMO_MIN_TRIGGER_TIME;
+    MAX_TRIGGER_TIME = DEMO_MAX_TRIGGER_TIME;
   }
   else 
   {
-    MIN_COUNTER_TRIGGER = DEFAULT_MIN_COUNTER_TRIGGER;
-    MAX_COUNTER_TRIGGER = DEFAULT_MAX_COUNTER_TRIGGER;
-    setup_watchdog(DEFAULT_WATCHDOG_PARAM);
+    MIN_TRIGGER_TIME = DEFAULT_MIN_TRIGGER_TIME;
+    MAX_TRIGGER_TIME = DEFAULT_MAX_TRIGGER_TIME;
   }
 }
 
-void newTriggerCounter() {
-  counter_trigger = random(MIN_COUNTER_TRIGGER, MAX_COUNTER_TRIGGER);
+void newTriggerDelay() {
+  next_trigger_delay = random(MIN_TRIGGER_TIME, MAX_TRIGGER_TIME);
 }
 
 
@@ -117,105 +125,83 @@ void setup(){
   pinMode(RIGHT_PAGER_MOTOR_PIN, OUTPUT);
   pinMode(LEFT_PAGER_MOTOR_PIN, OUTPUT);
   pinMode(PIEZO_PIN, OUTPUT);
+
+  // High == light, low == dark
   pinMode(LDR_PIN,INPUT);
+  
+  // for the config pins, enable the AVR's built in pull-up resistor.
+  // Thus we only need a jumper to ground.
+  // Also defaults the device to demo mode, annoying in light. 
   pinMode(LIGHT_LEVEL_CONFIG_PIN,INPUT);
+  digitalWrite(LIGHT_LEVEL_CONFIG_PIN, HIGH);
   pinMode(DEMO_CONFIG_PIN,INPUT);
+  digitalWrite(DEMO_CONFIG_PIN, HIGH);
   
   randomSeed(millis());
 
   demo_mode = digitalRead(DEMO_CONFIG_PIN);
   doConfig();  
   
-  // Set up hardware power down options  
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN); 
-
+  // do what we can on the ATMega8 to reduce power usage
   ADCSRA &= ~(1<<ADEN); //Disable ADC
   ACSR = (1<<ACD); //Disable the analog comparator
-  DIDR0 = 0x3F; //Disable digital input buffers on all ADC0-ADC5 pins
 
-  sei();
-    
-  newTriggerCounter();
-  
-  counter_trigger += (demo_mode ? DEMO_INITIAL_COUNTER_TRIGGER : DEFAULT_INITIAL_COUNTER_TRIGGER);
-  
-    // flip the safety switch - sleep commands will now cause the system to powerdown
-  sleep_enable();
-
+  newTriggerDelay();
 }
 
 
 void loop(){
   #ifdef SERIAL_DEBUG
-  Serial.print("Sleeping...");
-  Serial.flush();
-  delay(20);
+  Serial.println("-> Loop");
+  Serial.println("Sleeping for:");
+  Serial.println(next_trigger_delay);
+  #endif
+  delay(next_trigger_delay * 1000);
   
-  #endif
-  sleep_mode();
-
-  #ifdef SERIAL_DEBUG
-  Serial.println("awake");
-  #endif
-
   demo_mode = digitalRead(DEMO_CONFIG_PIN);
+  #ifdef SERIAL_DEBUG
+  Serial.println("Demo mode?");
+  Serial.println(demo_mode);
+  #endif
 
-  if (started && !demo_mode) {
-    active_counter++;
+  if (demo_mode) {
+    // we only want to decrement the "hidden mode" trigger 
+    active_days_counter = millis();
+  } else {
+    // see if we've been running for another day
+    // NB - this all wraps-around after ~50 days
+    // but as I believe both sides will wrap around, the test is valid and doesn't need
+    // explicit overflow detection.
+    if (millis() > (active_days_counter+DAY)) {
+      active_days_counter = millis() + DAY;
+      // halve the defaults...
+      DEFAULT_MIN_TRIGGER_TIME = DEFAULT_MIN_TRIGGER_TIME / 2;
+      DEFAULT_MAX_TRIGGER_TIME = DEFAULT_MAX_TRIGGER_TIME / 2;
+    }
   }
+ 
+  // update configuration
+  doConfig();
+  
+  // next delay
+  newTriggerDelay();
 
-  // reduce default delay intervals every two days or so.
-  if (active_counter >= DAY*2) {
-    active_counter = 0;
+  // if light level is appropriate, do something annoying!
+  if (digitalRead(LIGHT_LEVEL_CONFIG_PIN) == digitalRead(LDR_PIN)) {
+    #ifdef SERIAL_DEBUG
+    Serial.println("LDR level & light config match!");
+    Serial.println("Value is:");
+    Serial.println(digitalRead(LIGHT_LEVEL_CONFIG_PIN));
+    #endif
     
-    // halve the defaults...
-    DEFAULT_MIN_COUNTER_TRIGGER = DEFAULT_MIN_COUNTER_TRIGGER / 2;
-    DEFAULT_MAX_COUNTER_TRIGGER = DEFAULT_MAX_COUNTER_TRIGGER / 2;
-  }
-
-  doConfig();  // we can switch from demo to 'hidden' mode on the fly & this will update the default durations between activations
-  
-  if (watchdog_counter >= counter_trigger) {
-    watchdog_counter = 0;
-    newTriggerCounter();
-    started = true;
-    if (digitalRead(LIGHT_LEVEL_CONFIG_PIN) == digitalRead(LDR_PIN)) {
-      Serial.println("LDR level & light config match! ")
-      Serial.println("Value is:");
-      Serial.println(digitalRead(LIGHT_LEVEL_CONFIG_PIN));
-      
-      annoy();
-    } 
+    annoy();
+  } else {
+    #ifdef SERIAL_DEBUG
+    Serial.println("LDR Level not correct for trigger!");
+    #endif
   }
 }
   
-
-// 0=16ms, 1=32ms,2=64ms,3=128ms,4=250ms,5=500ms
-// 6=1 sec,7=2 sec, 8=4 sec, 9= 8sec
-void setup_watchdog(int ii) {
-
-  byte bb;
-  int ww;
-  if (ii > 9 ) ii=9;
-  bb=ii & 7;
-  if (ii > 7) bb|= (1<<5);
-  bb|= (1<<WDCE);
-  ww=bb;
-
-  MCUSR &= ~(1<<WDRF);
-  // start timed sequence
-  WDTCR_REG |= (1<<WDCE) | (1<<WDE);
-  // set new watchdog timeout value
-  WDTCR_REG = bb;
-  WDTCR_REG |= _BV(WDIE);
-}
-
-
-// executed when watchdog timer expires
-ISR(WDT_vect) {
-  watchdog_counter++;  // increment volatile
-}
-
 // Play sounnd- shamelessly copied from https://github.com/lewisd32/AnnoyATtiny85/blob/master/AnnoyATTiny85.ino
 void play(long period, long durationMillis) {
   play(period, durationMillis, 0, SOUND_DUTY);
@@ -391,9 +377,9 @@ void play_pcm() {
     delayMicroseconds(250);
   }
   
-  
-  
   OCR1A=0;
-  //analogWrite(PIEZO_PIN, 0);
+  // probably redundant, but I'm guessing it will reset PWM settings to a lower value
+  // might use less power
+  analogWrite(PIEZO_PIN, 0);
 }
 

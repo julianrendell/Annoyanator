@@ -1,6 +1,6 @@
 # The Annoyinator Mk 1
 
-_A "Green Christmas" (only use what you have) for Allan, inspired by
+_A "Green Christmas" present_ (only use what you have) for Allan, inspired by:
 
 * a conversation we had about him wanting to scare a friend
 * The [AnnoyATtiny85] Kit my son bought at Vancouer MakeFair 2012
